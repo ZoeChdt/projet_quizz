@@ -10,10 +10,10 @@
 
 class questionNumerique : public question {
 public:
-    questionNumerique(const std::string& enonce, int reponse);
+    questionNumerique(std::string  enonce, int reponse);
     std::string enonce() const override;
-    int reponse() const override;
-    bool reponseJuste(int reponse) const override;
+    std::string reponse() const override;
+    bool reponseJuste(const std::string& reponse) const override;
 private:
     std::string d_enonce;
     int d_reponse;
