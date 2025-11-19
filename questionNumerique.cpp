@@ -13,8 +13,8 @@ std::string questionNumerique::enonce() const {
     return d_enonce;
 }
 
-std::string questionNumerique::reponse() const {
-    return std::to_string(d_reponse);
+int questionNumerique::reponse() const {
+    return d_reponse;
 }
 
 bool questionNumerique::reponseJuste(const std::string &reponse) const {

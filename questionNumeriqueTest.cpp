@@ -15,7 +15,7 @@ TEST_CASE("[questionNumerique] L'enoncé est correctement stocké") {
 
 TEST_CASE("[questionNumerique] La réponse est correctement stockée") {
     questionNumerique q{"Combien font 5+7 ?", 12};
-    REQUIRE(q.reponse() == "12");
+    REQUIRE(q.reponse() == 12);
 }
 
 // Tests : reponseJuste
