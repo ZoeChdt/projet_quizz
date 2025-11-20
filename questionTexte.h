@@ -12,7 +12,7 @@ class questionTexte : public question {
 public:
     questionTexte(std::string enonce, std::string reponse);
     std::string enonce() const override;
-    std::string reponse() const override;
+    std::string reponse() const;
     bool reponseJuste(const std::string& reponse) const override;
 private:
     std::string d_enonce;

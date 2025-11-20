@@ -10,7 +10,6 @@ class question {
 public:
     virtual ~question() = default;
     virtual std::string enonce() const =0;
-    virtual std::string reponse() const =0;
     virtual bool reponseJuste(const std::string& reponse) const = 0;
 };
 
