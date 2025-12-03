@@ -30,7 +30,25 @@ int questionNumerique::limiteMaximum() const {
     return d_limiteMaximum;
 }
 
+//Ajout de cette fonction bien verif que la réponse est bien un entier sinon ça ne fonctionnera pas dans estJuste()
+bool estEntier(const std::string &s) {
+    if (s.empty())
+        return false;
+    else {
+        size_t j = 0;
+        if (s[0]== '-')
+            j = 1;
+        for (size_t i = j; i < s.length(); ++i)
+            if (!isdigit(s[i]))
+                return false;
+    }
+    return true;
+}
+
 bool questionNumerique::reponseJuste(const std::string &reponse) const {
 
-    return reponse == std::to_string(d_reponse);
+    if (!estEntier(reponse))
+        return false;
+    int valeur = std::stoi(reponse); //la chaîne est un entier
+    return (valeur == d_reponse) && (valeur >= d_limiteMinimum) && (valeur <= d_limiteMaximum);
 }
