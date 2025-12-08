@@ -12,7 +12,8 @@ class questionNumerique : public question {
 public:
     questionNumerique(std::string  enonce, int reponse, int limiteMin, int limiteMax);
     std::string enonce() const override;
-    int reponse() const;
+    std::string reponse() const override;
+    int reponseNumerique() const;
     int limiteMinimum() const;
     int limiteMaximum() const;
     bool reponseJuste(const std::string& reponse) const override;

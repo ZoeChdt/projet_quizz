@@ -18,7 +18,11 @@ std::string questionNumerique::enonce() const {
     return d_enonce;
 }
 
-int questionNumerique::reponse() const {
+std::string questionNumerique::reponse() const {
+    return std::to_string(d_reponse);
+}
+
+int questionNumerique::reponseNumerique() const {
     return d_reponse;
 }
 
@@ -50,5 +54,5 @@ bool questionNumerique::reponseJuste(const std::string &reponse) const {
     if (!estEntier(reponse))
         return false;
     int valeur = std::stoi(reponse); //la chaîne est un entier
-    return (valeur == d_reponse) && (valeur >= d_limiteMinimum) && (valeur <= d_limiteMaximum);
+    return (valeur >= d_limiteMinimum) && (valeur <= d_limiteMaximum);
 }
