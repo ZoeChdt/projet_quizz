@@ -28,6 +28,18 @@ std::string questionQCM::choix(int i) const {
     return d_choix[i];
 }
 
+bool estEntierPositif(const std::string &s) {
+    if (s.empty())
+        return false;
+    for (size_t i = 0; i < s.length(); ++i)
+        if (!isdigit(s[i]))
+            return false;
+    return true;
+}
+
 bool questionQCM::reponseJuste(const std::string& reponse) const {
-    return std::stoi(reponse) == d_numeroReponse;
+    if (!estEntierPositif(reponse))
+        return false;
+    int rep = std::stoi(reponse);
+    return rep == d_numeroReponse;
 }
