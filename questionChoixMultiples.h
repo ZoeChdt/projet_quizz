@@ -13,7 +13,7 @@ public:
     std::string enonce() const override;
     int numeroReponse() const;
     int nombreChoix() const;
-    std::string reponse() const;
+    std::string reponse() const override;
     std::string choix(int i) const;
     bool reponseJuste(const std::string& reponse) const override;
 private:

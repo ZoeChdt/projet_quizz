@@ -27,7 +27,7 @@ TEST_CASE("[questionTexte] Retourne juste pour bonne reponse") {
 
 //Tests : reponse Fausse
 
-TEST_CASE("[questionTexte] Retourne juste pour bonne reponse") {
+TEST_CASE("[questionTexte] Retourne juste pour mauvaise reponse") {
     questionTexte q{"Quelle est la capitale de France ?", "Paris"};
     REQUIRE_FALSE(q.reponseJuste("Londres"));
 }
