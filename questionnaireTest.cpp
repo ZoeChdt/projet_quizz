@@ -42,13 +42,13 @@ TEST_CASE("[questionnaire] Ajouter plusieurs questions") {
 
 // Tests recupererQuestion
 
-TEST_CASE("questionnaire] Recuperer une question texte") {
+TEST_CASE("[questionnaire] Recuperer une question texte") {
     questionnaire q{"Quizz"};
     q.ajouterQuestion(std::make_unique<questionTexte>("Capital de la France ?", "Paris"));
 
     const question& quest = q.recupererQuestion(0);
     REQUIRE(quest.enonce()=="Capital de la France ?");
-    REQUIRE(quest.enonce()=="Paris");
+    REQUIRE(quest.reponse()=="Paris");
 }
 
 TEST_CASE("[questionnaire] Recuperer plusieurs question dans l'odre") {
