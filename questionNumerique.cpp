@@ -56,3 +56,24 @@ bool questionNumerique::reponseJuste(const std::string &reponse) const {
     int valeur = std::stoi(reponse); //la chaîne est un entier
     return (valeur >= d_limiteMinimum) && (valeur <= d_limiteMaximum);
 }
+
+std::string questionNumerique::typeQuestion() const {
+    return "NUMERIQUE";
+}
+
+void questionNumerique::sauvegarder(std::ofstream& fichier) const {
+    fichier << typeQuestion() << "\n";
+    fichier << d_enonce << "\n";
+    fichier << d_reponse << "\n";
+    fichier << d_limiteMinimum << "\n";
+    fichier << d_limiteMaximum << "\n";
+}
+
+std::unique_ptr<questionNumerique> questionNumerique::chargerDepuisFichier(std::ifstream& fichier) {
+    std::string enonce;
+    int reponse, limMin, limMax;
+    std::getline(fichier, enonce);
+    fichier >> reponse >> limMin >> limMax;
+    fichier.ignore();
+    return std::make_unique<questionNumerique>(enonce, reponse, limMin, limMax);
+}

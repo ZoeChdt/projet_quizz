@@ -4,7 +4,8 @@
 
 #ifndef PROJET_QUIZZ_QUESTIONNUMERIQUE_H
 #define PROJET_QUIZZ_QUESTIONNUMERIQUE_H
-#include <iostream>
+
+#include<fstream>
 
 #include "question.h"
 
@@ -17,6 +18,9 @@ public:
     int limiteMinimum() const;
     int limiteMaximum() const;
     bool reponseJuste(const std::string& reponse) const override;
+    std::string typeQuestion() const override;
+    void sauvegarder(std::ofstream& fichier) const override;
+    std::unique_ptr<questionNumerique> chargerDepuisFichier(std::ifstream& fichier);
 private:
     std::string d_enonce;
     int d_reponse;
