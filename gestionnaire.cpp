@@ -1,11 +1,8 @@
 //
 // Created by chzoe on 13/12/2025.
 //
-
 #include "gestionnaire.h"
-#include "questionRegistry.h"
-#include <fstream>
-#include <stdexcept>
+#include "questionRepertoire.h"
 
 void gestionnaire::sauvegarder(const questionnaire& q, const std::string& nomFichier) {
     std::ofstream fichier(nomFichier);
@@ -43,7 +40,7 @@ questionnaire gestionnaire::charger(const std::string& nomFichier) {
         std::string type;
         std::getline(fichier, type);
 
-        auto quest = questionRegistry::instance().charger(fichier, type);
+        auto quest = questionRepertoire::instance().charger(fichier, type);
         if (quest) {
             q.ajouterQuestion(std::move(quest));
         }

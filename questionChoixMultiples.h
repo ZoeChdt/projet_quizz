@@ -19,7 +19,7 @@ public:
     bool reponseJuste(const std::string& reponse) const override;
     std::string typeQuestion() const override;
     void sauvegarder(std::ofstream& fichier) const override;
-    std::unique_ptr<questionQCM> chargerDepuisFichier(std::ifstream& fichier);
+    std::unique_ptr<question> chargerDepuisFichier(std::ifstream& fichier) const override;
 private:
     std::string d_enonce;
     std::vector<std::string> d_choix;

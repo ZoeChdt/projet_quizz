@@ -28,9 +28,9 @@ void questionTexte::sauvegarder(std::ofstream& fichier) const{
     fichier << d_reponse << "\n";
 }
 
-std::unique_ptr<questionTexte> questionTexte::chargerDepuisFichier(std::ifstream& fichier) {
+std::unique_ptr<question> questionTexte::chargerDepuisFichier(std::ifstream& fichier) const {
     std::string enonce, reponse;
     std::getline(fichier, enonce);
     std::getline(fichier, reponse);
-    return std::make_unique<questionTexte>(enonce, reponse);
+    return std::unique_ptr<question>(new questionTexte(enonce, reponse));
 }

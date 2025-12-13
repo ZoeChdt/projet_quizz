@@ -57,7 +57,7 @@ void questionQCM::sauvegarder(std::ofstream& fichier) const {
     fichier << d_numeroReponse << "\n";
 }
 
-std::unique_ptr<questionQCM> questionQCM::chargerDepuisFichier(std::ifstream& fichier) {
+std::unique_ptr<question> questionQCM::chargerDepuisFichier(std::ifstream& fichier) const {
     std::string enonce;
     int nbChoix;
     std::getline(fichier, enonce);
@@ -75,5 +75,5 @@ std::unique_ptr<questionQCM> questionQCM::chargerDepuisFichier(std::ifstream& fi
     fichier >> numeroReponse;
     fichier.ignore();
 
-    return std::make_unique<questionQCM>(enonce, choix, numeroReponse);
+    return std::unique_ptr<question>(new questionQCM(enonce, choix, numeroReponse));
 }

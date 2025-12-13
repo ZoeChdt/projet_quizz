@@ -34,7 +34,6 @@ int questionNumerique::limiteMaximum() const {
     return d_limiteMaximum;
 }
 
-//Ajout de cette fonction bien verif que la réponse est bien un entier sinon ça ne fonctionnera pas dans estJuste()
 bool estEntier(const std::string &s) {
     if (s.empty())
         return false;
@@ -69,11 +68,11 @@ void questionNumerique::sauvegarder(std::ofstream& fichier) const {
     fichier << d_limiteMaximum << "\n";
 }
 
-std::unique_ptr<questionNumerique> questionNumerique::chargerDepuisFichier(std::ifstream& fichier) {
+std::unique_ptr<question> questionNumerique::chargerDepuisFichier(std::ifstream& fichier) const {
     std::string enonce;
     int reponse, limMin, limMax;
     std::getline(fichier, enonce);
     fichier >> reponse >> limMin >> limMax;
     fichier.ignore();
-    return std::make_unique<questionNumerique>(enonce, reponse, limMin, limMax);
+    return std::unique_ptr<question>(new questionNumerique(enonce, reponse, limMin, limMax));
 }

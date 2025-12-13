@@ -8,6 +8,9 @@
 #include <string>
 #include "questionnaire.h"
 
+#include <fstream>
+#include <stdexcept>
+
 class gestionnaire {
 public:
     void sauvegarder(const questionnaire& q, const std::string& nomFichier);
