@@ -43,3 +43,37 @@ bool questionQCM::reponseJuste(const std::string& reponse) const {
     int rep = std::stoi(reponse);
     return rep == d_numeroReponse;
 }
+std::string questionQCM::typeQuestion() const {
+    return "QCM";
+}
+
+void questionQCM::sauvegarder(std::ofstream& fichier) const {
+    fichier << typeQuestion() << "\n";
+    fichier << d_enonce << "\n";
+    fichier << d_choix.size() << "\n";
+    for (const auto& c : d_choix) {
+        fichier << c << "\n";
+    }
+    fichier << d_numeroReponse << "\n";
+}
+
+std::unique_ptr<question> questionQCM::chargerDepuisFichier(std::ifstream& fichier) const {
+    std::string enonce;
+    int nbChoix;
+    std::getline(fichier, enonce);
+    fichier >> nbChoix;
+    fichier.ignore();
+
+    std::vector<std::string> choix;
+    for (int j = 0; j < nbChoix; ++j) {
+        std::string c;
+        std::getline(fichier, c);
+        choix.push_back(c);
+    }
+
+    int numeroReponse;
+    fichier >> numeroReponse;
+    fichier.ignore();
+
+    return std::unique_ptr<question>(new questionQCM(enonce, choix, numeroReponse));
+}

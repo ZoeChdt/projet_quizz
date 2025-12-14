@@ -4,7 +4,7 @@
 
 #ifndef PROJET_QUIZZ_QUESTIONTEXTE_H
 #define PROJET_QUIZZ_QUESTIONTEXTE_H
-#include<iostream>
+#include<fstream>
 
 #include "question.h"
 
@@ -14,6 +14,10 @@ public:
     std::string enonce() const override;
     std::string reponse() const override;
     bool reponseJuste(const std::string& reponse) const override;
+    std::string typeQuestion() const override;
+    void sauvegarder(std::ofstream& fichier) const override;
+    std::unique_ptr<question> chargerDepuisFichier(std::ifstream& fichier) const override;
+
 private:
     std::string d_enonce;
     std::string d_reponse;

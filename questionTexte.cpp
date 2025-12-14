@@ -17,3 +17,20 @@ std::string questionTexte::reponse() const {
 bool questionTexte::reponseJuste(const std::string& reponse) const {
     return reponse == d_reponse;
 }
+
+std::string questionTexte::typeQuestion() const {
+    return "TEXTE";
+}
+
+void questionTexte::sauvegarder(std::ofstream& fichier) const{
+    fichier << typeQuestion() << "\n";
+    fichier << d_enonce << "\n";
+    fichier << d_reponse << "\n";
+}
+
+std::unique_ptr<question> questionTexte::chargerDepuisFichier(std::ifstream& fichier) const {
+    std::string enonce, reponse;
+    std::getline(fichier, enonce);
+    std::getline(fichier, reponse);
+    return std::unique_ptr<question>(new questionTexte(enonce, reponse));
+}

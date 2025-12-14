@@ -6,6 +6,7 @@
 #define PROJET_QUIZZ_QUESTIONCHOIXMULTIPLES_H
 #include "question.h"
 #include <vector>
+#include <fstream>
 
 class questionQCM : public question {
 public:
@@ -16,6 +17,9 @@ public:
     std::string reponse() const override;
     std::string choix(int i) const;
     bool reponseJuste(const std::string& reponse) const override;
+    std::string typeQuestion() const override;
+    void sauvegarder(std::ofstream& fichier) const override;
+    std::unique_ptr<question> chargerDepuisFichier(std::ifstream& fichier) const override;
 private:
     std::string d_enonce;
     std::vector<std::string> d_choix;
