@@ -9,16 +9,12 @@
 #include "questionChoixMultiples.h"
 #include <sstream>
 
-// Tests du singleton
-
 TEST_CASE("[questionRepertoire] Instance retourne toujours le même objet") {
     questionRepertoire& rep1 = questionRepertoire::instance();
     questionRepertoire& rep2 = questionRepertoire::instance();
 
     REQUIRE(&rep1 == &rep2);
 }
-
-// Tests de chargement des questions
 
 TEST_CASE("[questionRepertoire] Charger une question texte") {
     std::stringstream ss;
@@ -90,10 +86,7 @@ TEST_CASE("[questionRepertoire] Charger un QCM") {
     std::remove("temp_qcm.txt");
 }
 
-// Tests d'enregistrement de prototypes
-
 TEST_CASE("[questionRepertoire] Enregistrer un nouveau prototype") {
-    // Créer un prototype personnalisé
     auto prototype = std::make_unique<questionTexte>("", "");
     std::string type = prototype->typeQuestion();
 
@@ -114,8 +107,6 @@ TEST_CASE("[questionRepertoire] Enregistrer un nouveau prototype") {
 
     std::remove("temp_enreg.txt");
 }
-
-// Tests d'intégration avec sauvegarde/chargement
 
 TEST_CASE("[questionRepertoire] Sauvegarde et chargement d'une question texte") {
     questionTexte qOriginal{"Question originale ?", "Réponse originale"};
@@ -186,10 +177,7 @@ TEST_CASE("[questionRepertoire] Sauvegarde et chargement d'un QCM") {
     std::remove("temp_integration_qcm.txt");
 }
 
-// Tests de robustesse
-
 TEST_CASE("[questionRepertoire] Les prototypes par défaut sont enregistrés") {
-    // Les types TEXTE, NUMERIQUE et QCM doivent être disponibles dès le départ
     std::ofstream temp1("temp_default1.txt");
     temp1 << "Test\nReponse\n";
     temp1.close();
