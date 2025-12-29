@@ -6,21 +6,15 @@
 #define PROJET_QUIZZ1_SESSIONAPPRENTISSAGE_H
 
 #include <string>
+#include "session.h"
 #include "questionnaire.h"
 
-class sessionApprentissage {
+class sessionApprentissage : public session {
 public:
-    sessionApprentissage(const questionnaire &q);
-    size_t index() const;
-    bool estTerminee() const;
-    const question& questionCourante() const;
+    sessionApprentissage(const questionnaire& q);
     std::string reponseCourante() const;
-    void questionSuivante();
 
 
-private:
-    const questionnaire& d_questionnaire;
-    size_t d_index;
 };
 
 
