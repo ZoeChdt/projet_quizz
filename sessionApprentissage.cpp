@@ -10,9 +10,7 @@
 sessionApprentissage::sessionApprentissage(const questionnaire &q): session{q}
 {}
 
-std::string sessionApprentissage::reponseCourante() const {
-    return questionCourante().reponse();
-}
+
 
 
 

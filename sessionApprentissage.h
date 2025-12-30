@@ -12,7 +12,7 @@
 class sessionApprentissage : public session {
 public:
     sessionApprentissage(const questionnaire& q);
-    std::string reponseCourante() const;
+
 
 
 };
