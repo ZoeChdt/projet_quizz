@@ -21,6 +21,10 @@ const question &session::questionCourante() const {
     return d_questionnaire.recupererQuestion(indice);
 }
 
+std::string session::reponseCourante() const {
+    return questionCourante().reponse();
+}
+
 void session::questionSuivante() {
     if (!estTerminee())
         ++d_index;

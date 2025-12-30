@@ -14,6 +14,7 @@ public:
     virtual ~session()=default;
     bool estTerminee() const;
     const question& questionCourante()const;
+    std::string reponseCourante() const;
     virtual void questionSuivante();
     size_t nombreIndices () const;
     size_t indiceNumero(size_t i) const;

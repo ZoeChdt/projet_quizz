@@ -26,6 +26,9 @@ TEST_CASE("[session] la classe est correctement implémentée") {
     SUBCASE("La question courante retournée est correcte") {
         REQUIRE_EQ(s.questionCourante().enonce(),q.recupererQuestion(0).enonce());
     }
+    SUBCASE("La réponse courante retournée est correcte") {
+        REQUIRE_EQ(s.reponseCourante(),q.recupererQuestion(0).reponse());
+    }
     SUBCASE("Le passage à la question suivante fonctionne") {
         s.questionSuivante();
         REQUIRE_EQ(s.index(),1);
