@@ -13,13 +13,24 @@ class sessionEvaluation : public session{
     public:
     sessionEvaluation(const questionnaire &q);
     virtual ~sessionEvaluation()=default;
+
     int nombreEssais() const;
     int nombreQuestionsJustes() const;
 
-    virtual bool transmettreReponse(const std::string &reponse )=0;
+    void ajouterQuestionsJustes();
+    void ajouterEssais();
+
+    bool transmettreReponse(const std::string &reponse );
+
+    void comptabiliserBonneReponse();
+    void comptabiliserMauvaiseReponse();
+
+    virtual void gererSucces();
+    virtual void gererEchec();
+
     virtual bool afficherBonneReponse()const =0;
 
-    protected:
+    private:
     int d_nombreQuestionsJustes, d_nombreEssais;
 };
 
