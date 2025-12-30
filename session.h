@@ -15,7 +15,12 @@ public:
     bool estTerminee() const;
     const question& questionCourante()const;
     virtual void questionSuivante();
-protected:
+    size_t nombreIndices () const;
+    size_t indiceNumero(size_t i) const;
+    size_t index() const;
+
+
+private:
     const questionnaire& d_questionnaire;
     std::vector<size_t> d_indices;
     size_t d_index;
