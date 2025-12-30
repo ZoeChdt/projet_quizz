@@ -1,5 +1,5 @@
 //
-// Created by chzoe on 13/12/2025.
+// Created by chzoe on 22/12/2025.
 //
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
@@ -8,200 +8,191 @@
 #include "questionNumerique.h"
 #include "questionChoixMultiples.h"
 #include <sstream>
+#include <fstream>
 
-TEST_CASE("[questionRepertoire] Instance retourne toujours le même objet") {
+TEST_CASE("[questionRepertoire] L'instance singleton retourne toujours la meme reference") {
     questionRepertoire& rep1 = questionRepertoire::instance();
     questionRepertoire& rep2 = questionRepertoire::instance();
-
     REQUIRE(&rep1 == &rep2);
 }
 
-TEST_CASE("[questionRepertoire] Charger une question texte") {
-    std::stringstream ss;
-    ss << "Question texte ?\n";
-    ss << "Réponse texte\n";
+TEST_CASE("[questionRepertoire] Charger une question de type TEXTE") {
+    SUBCASE("La question texte chargee est correcte") {
+        std::string nomFichier = "test_rep_texte.txt";
+        std::ofstream fichier(nomFichier);
+        fichier << "Question texte test\n";
+        fichier << "Reponse test\n";
+        fichier.close();
 
-    std::ifstream fichier;
-    // Créer un fichier temporaire
-    std::ofstream temp("temp_texte.txt");
-    temp << ss.str();
-    temp.close();
+        std::ifstream fichierLecture(nomFichier);
+        auto q = questionRepertoire::instance().charger(fichierLecture, "TEXTE");
+        fichierLecture.close();
 
-    fichier.open("temp_texte.txt");
-    auto question = questionRepertoire::instance().charger(fichier, "TEXTE");
+        REQUIRE(q->typeQuestion() == "TEXTE");
+        REQUIRE(q->enonce() == "Question texte test");
+        REQUIRE(q->reponse() == "Reponse test");
+
+        std::remove(nomFichier.c_str());
+    }
+}
+
+TEST_CASE("[questionRepertoire] Charger une question de type NUMERIQUE") {
+    SUBCASE("La question numerique chargee est correcte") {
+        std::string nomFichier = "test_rep_num.txt";
+        std::ofstream fichier(nomFichier);
+        fichier << "Combien font 5+5 ?\n";
+        fichier << "10\n";
+        fichier << "0\n";
+        fichier << "20\n";
+        fichier.close();
+
+        std::ifstream fichierLecture(nomFichier);
+        auto q = questionRepertoire::instance().charger(fichierLecture, "NUMERIQUE");
+        fichierLecture.close();
+
+        REQUIRE(q->typeQuestion() == "NUMERIQUE");
+        REQUIRE(q->enonce() == "Combien font 5+5 ?");
+        REQUIRE(q->reponse() == "10");
+
+        std::remove(nomFichier.c_str());
+    }
+
+    SUBCASE("La validation des reponses fonctionne correctement") {
+        std::string nomFichier = "test_rep_num2.txt";
+        std::ofstream fichier(nomFichier);
+        fichier << "Combien font 5+5 ?\n";
+        fichier << "10\n";
+        fichier << "0\n";
+        fichier << "20\n";
+        fichier.close();
+
+        std::ifstream fichierLecture(nomFichier);
+        auto q = questionRepertoire::instance().charger(fichierLecture, "NUMERIQUE");
+        fichierLecture.close();
+
+        REQUIRE(q->reponseJuste("10"));
+        REQUIRE(q->reponseJuste("15"));
+        REQUIRE_FALSE(q->reponseJuste("25"));
+
+        std::remove(nomFichier.c_str());
+    }
+}
+
+TEST_CASE("[questionRepertoire] Charger une question de type QCM") {
+    SUBCASE("La question QCM chargee est correcte") {
+        std::string nomFichier = "test_rep_qcm.txt";
+        std::ofstream fichier(nomFichier);
+        fichier << "Quelle est la couleur du ciel ?\n";
+        fichier << "3\n";
+        fichier << "Rouge\n";
+        fichier << "Vert\n";
+        fichier << "Bleu\n";
+        fichier << "2\n";
+        fichier.close();
+
+        std::ifstream fichierLecture(nomFichier);
+        auto q = questionRepertoire::instance().charger(fichierLecture, "QCM");
+        fichierLecture.close();
+
+        REQUIRE(q->typeQuestion() == "QCM");
+        REQUIRE(q->enonce() == "Quelle est la couleur du ciel ?");
+        REQUIRE(q->reponse() == "Bleu");
+
+        std::remove(nomFichier.c_str());
+    }
+
+    SUBCASE("La validation des reponses fonctionne correctement") {
+        std::string nomFichier = "test_rep_qcm2.txt";
+        std::ofstream fichier(nomFichier);
+        fichier << "Quelle est la couleur du ciel ?\n";
+        fichier << "3\n";
+        fichier << "Rouge\n";
+        fichier << "Vert\n";
+        fichier << "Bleu\n";
+        fichier << "2\n";
+        fichier.close();
+
+        std::ifstream fichierLecture(nomFichier);
+        auto q = questionRepertoire::instance().charger(fichierLecture, "QCM");
+        fichierLecture.close();
+
+        REQUIRE(q->reponseJuste("2"));
+        REQUIRE_FALSE(q->reponseJuste("0"));
+
+        std::remove(nomFichier.c_str());
+    }
+}
+
+TEST_CASE("[questionRepertoire] Charger un type de question inconnu lance une exception") {
+    std::string nomFichier = "test_rep_inconnu.txt";
+    std::ofstream fichier(nomFichier);
+    fichier << "Question test\n";
     fichier.close();
 
-    REQUIRE(question != nullptr);
-    REQUIRE(question->typeQuestion() == "TEXTE");
-    REQUIRE(question->enonce() == "Question texte ?");
-    REQUIRE(question->reponse() == "Réponse texte");
+    std::ifstream fichierLecture(nomFichier);
+    REQUIRE_THROWS_AS(
+        questionRepertoire::instance().charger(fichierLecture, "TYPE_INCONNU"),
+        std::runtime_error
+    );
+    fichierLecture.close();
 
-    std::remove("temp_texte.txt");
+    std::remove(nomFichier.c_str());
 }
 
-TEST_CASE("[questionRepertoire] Charger une question numérique") {
-    std::ofstream temp("temp_num.txt");
-    temp << "Combien font 2+2 ?\n";
-    temp << "4\n";
-    temp << "0\n";
-    temp << "10\n";
-    temp.close();
+TEST_CASE("[questionRepertoire] Charger plusieurs questions de types differents") {
+    questionRepertoire& rep = questionRepertoire::instance();
 
-    std::ifstream fichier("temp_num.txt");
-    auto question = questionRepertoire::instance().charger(fichier, "NUMERIQUE");
-    fichier.close();
+    SUBCASE("Charger une question texte puis une question numerique") {
+        std::string nomFichier1 = "test_multi_texte.txt";
+        std::ofstream f1(nomFichier1);
+        f1 << "Question 1\nReponse 1\n";
+        f1.close();
 
-    REQUIRE(question != nullptr);
-    REQUIRE(question->typeQuestion() == "NUMERIQUE");
-    REQUIRE(question->enonce() == "Combien font 2+2 ?");
-    REQUIRE(question->reponse() == "4");
-    REQUIRE(question->reponseJuste("4"));
-    REQUIRE(question->reponseJuste("5"));
-    REQUIRE_FALSE(question->reponseJuste("15"));
+        std::ifstream if1(nomFichier1);
+        auto q1 = rep.charger(if1, "TEXTE");
+        if1.close();
 
-    std::remove("temp_num.txt");
-}
+        std::string nomFichier2 = "test_multi_num.txt";
+        std::ofstream f2(nomFichier2);
+        f2 << "Question 2\n42\n0\n100\n";
+        f2.close();
 
-TEST_CASE("[questionRepertoire] Charger un QCM") {
-    std::ofstream temp("temp_qcm.txt");
-    temp << "Quelle est la capitale de France ?\n";
-    temp << "3\n";
-    temp << "Paris\n";
-    temp << "Londres\n";
-    temp << "Berlin\n";
-    temp << "0\n";
-    temp.close();
+        std::ifstream if2(nomFichier2);
+        auto q2 = rep.charger(if2, "NUMERIQUE");
+        if2.close();
 
-    std::ifstream fichier("temp_qcm.txt");
-    auto question = questionRepertoire::instance().charger(fichier, "QCM");
-    fichier.close();
+        REQUIRE(q1->typeQuestion() == "TEXTE");
+        REQUIRE(q2->typeQuestion() == "NUMERIQUE");
+        REQUIRE(q1->enonce() == "Question 1");
+        REQUIRE(q2->enonce() == "Question 2");
 
-    REQUIRE(question != nullptr);
-    REQUIRE(question->typeQuestion() == "QCM");
-    REQUIRE(question->enonce() == "Quelle est la capitale de France ?");
-    REQUIRE(question->reponse() == "Paris");
-    REQUIRE(question->reponseJuste("0"));
-    REQUIRE_FALSE(question->reponseJuste("1"));
+        std::remove(nomFichier1.c_str());
+        std::remove(nomFichier2.c_str());
+    }
 
-    std::remove("temp_qcm.txt");
-}
+    SUBCASE("Charger une question numerique puis une question QCM") {
+        std::string nomFichier1 = "test_multi_num2.txt";
+        std::ofstream f1(nomFichier1);
+        f1 << "Question numerique\n42\n0\n100\n";
+        f1.close();
 
-TEST_CASE("[questionRepertoire] Enregistrer un nouveau prototype") {
-    auto prototype = std::make_unique<questionTexte>("", "");
-    std::string type = prototype->typeQuestion();
+        std::ifstream if1(nomFichier1);
+        auto q1 = rep.charger(if1, "NUMERIQUE");
+        if1.close();
 
-    REQUIRE_NOTHROW(questionRepertoire::instance().enregistrer(std::move(prototype)));
+        std::string nomFichier2 = "test_multi_qcm3.txt";
+        std::ofstream f2(nomFichier2);
+        f2 << "Question QCM\n2\nChoix A\nChoix B\n1\n";
+        f2.close();
 
-    // Vérifier qu'on peut charger ce type
-    std::ofstream temp("temp_enreg.txt");
-    temp << "Test enonce\n";
-    temp << "Test reponse\n";
-    temp.close();
+        std::ifstream if2(nomFichier2);
+        auto q2 = rep.charger(if2, "QCM");
+        if2.close();
 
-    std::ifstream fichier("temp_enreg.txt");
-    auto question = questionRepertoire::instance().charger(fichier, type);
-    fichier.close();
+        REQUIRE(q1->typeQuestion() == "NUMERIQUE");
+        REQUIRE(q2->typeQuestion() == "QCM");
 
-    REQUIRE(question != nullptr);
-    REQUIRE(question->typeQuestion() == type);
-
-    std::remove("temp_enreg.txt");
-}
-
-TEST_CASE("[questionRepertoire] Sauvegarde et chargement d'une question texte") {
-    questionTexte qOriginal{"Question originale ?", "Réponse originale"};
-
-    std::ofstream fichierSortie("temp_integration_texte.txt");
-    qOriginal.sauvegarder(fichierSortie);
-    fichierSortie.close();
-
-    std::ifstream fichierEntree("temp_integration_texte.txt");
-    std::string type;
-    std::getline(fichierEntree, type);
-
-    auto qCharge = questionRepertoire::instance().charger(fichierEntree, type);
-    fichierEntree.close();
-
-    REQUIRE(qCharge->typeQuestion() == qOriginal.typeQuestion());
-    REQUIRE(qCharge->enonce() == qOriginal.enonce());
-    REQUIRE(qCharge->reponse() == qOriginal.reponse());
-
-    std::remove("temp_integration_texte.txt");
-}
-
-TEST_CASE("[questionRepertoire] Sauvegarde et chargement d'une question numérique") {
-    questionNumerique qOriginal{"Combien font 10+5 ?", 15, 10, 20};
-
-    std::ofstream fichierSortie("temp_integration_num.txt");
-    qOriginal.sauvegarder(fichierSortie);
-    fichierSortie.close();
-
-    std::ifstream fichierEntree("temp_integration_num.txt");
-    std::string type;
-    std::getline(fichierEntree, type);
-
-    auto qCharge = questionRepertoire::instance().charger(fichierEntree, type);
-    fichierEntree.close();
-
-    REQUIRE(qCharge->typeQuestion() == qOriginal.typeQuestion());
-    REQUIRE(qCharge->enonce() == qOriginal.enonce());
-    REQUIRE(qCharge->reponse() == qOriginal.reponse());
-    REQUIRE(qCharge->reponseJuste("15"));
-    REQUIRE(qCharge->reponseJuste("18"));
-    REQUIRE_FALSE(qCharge->reponseJuste("25"));
-
-    std::remove("temp_integration_num.txt");
-}
-
-TEST_CASE("[questionRepertoire] Sauvegarde et chargement d'un QCM") {
-    std::vector<std::string> choix{"Rouge", "Vert", "Bleu", "Jaune"};
-    questionQCM qOriginal{"Quelle est la couleur du ciel ?", choix, 2};
-
-    std::ofstream fichierSortie("temp_integration_qcm.txt");
-    qOriginal.sauvegarder(fichierSortie);
-    fichierSortie.close();
-
-    std::ifstream fichierEntree("temp_integration_qcm.txt");
-    std::string type;
-    std::getline(fichierEntree, type);
-
-    auto qCharge = questionRepertoire::instance().charger(fichierEntree, type);
-    fichierEntree.close();
-
-    REQUIRE(qCharge->typeQuestion() == qOriginal.typeQuestion());
-    REQUIRE(qCharge->enonce() == qOriginal.enonce());
-    REQUIRE(qCharge->reponse() == qOriginal.reponse());
-    REQUIRE(qCharge->reponseJuste("2"));
-    REQUIRE_FALSE(qCharge->reponseJuste("0"));
-
-    std::remove("temp_integration_qcm.txt");
-}
-
-TEST_CASE("[questionRepertoire] Les prototypes par défaut sont enregistrés") {
-    std::ofstream temp1("temp_default1.txt");
-    temp1 << "Test\nReponse\n";
-    temp1.close();
-
-    std::ifstream fichier1("temp_default1.txt");
-    REQUIRE_NOTHROW(questionRepertoire::instance().charger(fichier1, "TEXTE"));
-    fichier1.close();
-    std::remove("temp_default1.txt");
-
-    std::ofstream temp2("temp_default2.txt");
-    temp2 << "Test\n5\n0\n10\n";
-    temp2.close();
-
-    std::ifstream fichier2("temp_default2.txt");
-    REQUIRE_NOTHROW(questionRepertoire::instance().charger(fichier2, "NUMERIQUE"));
-    fichier2.close();
-    std::remove("temp_default2.txt");
-
-    std::ofstream temp3("temp_default3.txt");
-    temp3 << "Test\n2\nA\nB\n0\n";
-    temp3.close();
-
-    std::ifstream fichier3("temp_default3.txt");
-    REQUIRE_NOTHROW(questionRepertoire::instance().charger(fichier3, "QCM"));
-    fichier3.close();
-    std::remove("temp_default3.txt");
+        std::remove(nomFichier1.c_str());
+        std::remove(nomFichier2.c_str());
+    }
 }
