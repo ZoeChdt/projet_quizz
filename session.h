@@ -20,10 +20,11 @@ public:
     size_t indiceNumero(size_t i) const;
     size_t index() const;
 
-
+protected:
+    std::vector<size_t> d_indices;
 private:
     const questionnaire& d_questionnaire;
-    std::vector<size_t> d_indices;
+
     size_t d_index;
 };
 
