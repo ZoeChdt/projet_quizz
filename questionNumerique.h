@@ -5,13 +5,13 @@
 #ifndef PROJET_QUIZZ_QUESTIONNUMERIQUE_H
 #define PROJET_QUIZZ_QUESTIONNUMERIQUE_H
 
-#include<fstream>
-
+#include <fstream>
 #include "question.h"
 
 class questionNumerique : public question {
 public:
-    questionNumerique(std::string  enonce, int reponse, int limiteMin, int limiteMax);
+    questionNumerique(std::string enonce, int reponse, int limiteMin, int limiteMax);
+
     std::string enonce() const override;
     std::string reponse() const override;
     int reponseNumerique() const;
@@ -21,12 +21,16 @@ public:
     std::string typeQuestion() const override;
     void sauvegarder(std::ofstream& fichier) const override;
     std::unique_ptr<question> chargerDepuisFichier(std::ifstream& fichier) const override;
+
 private:
     std::string d_enonce;
     int d_reponse;
     int d_limiteMinimum;
     int d_limiteMaximum;
-};
 
+    void validerLimites() const;
+    void validerReponse() const;
+    bool estDansIntervalle(int valeur) const;
+};
 
 #endif //PROJET_QUIZZ_QUESTIONNUMERIQUE_H

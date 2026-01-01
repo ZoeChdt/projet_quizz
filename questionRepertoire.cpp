@@ -8,9 +8,7 @@
 #include "questionChoixMultiples.h"
 
 questionRepertoire::questionRepertoire() {
-    enregistrer(std::unique_ptr<question>(new questionNumerique("", 0, 0, 0)));
-    enregistrer(std::unique_ptr<question>(new questionTexte("", "")));
-    enregistrer(std::unique_ptr<question>(new questionQCM("", std::vector<std::string>{"A"}, 0)));
+    enregistrerPrototypesParDefaut();
 }
 
 questionRepertoire& questionRepertoire::instance() {
@@ -19,6 +17,10 @@ questionRepertoire& questionRepertoire::instance() {
 }
 
 void questionRepertoire::enregistrer(std::unique_ptr<question> prototype) {
+    if (!prototype) {
+        throw std::invalid_argument("Le prototype ne peut pas être null");
+    }
+
     std::string type = prototype->typeQuestion();
     d_prototypes[type] = std::move(prototype);
 }
@@ -26,7 +28,26 @@ void questionRepertoire::enregistrer(std::unique_ptr<question> prototype) {
 std::unique_ptr<question> questionRepertoire::charger(std::ifstream& fichier, const std::string& type) {
     auto it = d_prototypes.find(type);
     if (it == d_prototypes.end()) {
-        throw std::runtime_error("Type de question inconnu: " + type);
+        throw std::runtime_error(
+            "Type de question inconnu : '" + type + "'");
     }
     return it->second->chargerDepuisFichier(fichier);
+}
+
+void questionRepertoire::enregistrerPrototypesParDefaut() {
+    enregistrer(creerPrototypeQuestionNumerique());
+    enregistrer(creerPrototypeQuestionTexte());
+    enregistrer(creerPrototypeQuestionQCM());
+}
+
+std::unique_ptr<question> questionRepertoire::creerPrototypeQuestionNumerique() {
+    return std::make_unique<questionNumerique>("", 0, 0, 0);
+}
+
+std::unique_ptr<question> questionRepertoire::creerPrototypeQuestionTexte() {
+    return std::make_unique<questionTexte>("", "");
+}
+
+std::unique_ptr<question> questionRepertoire::creerPrototypeQuestionQCM() {
+    return std::make_unique<questionQCM>("", std::vector<std::string>{"A"}, 0);
 }
