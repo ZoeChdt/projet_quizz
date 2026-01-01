@@ -3,15 +3,16 @@
 //
 
 #include "questionNumerique.h"
-
 #include <utility>
-questionNumerique::questionNumerique(std::string  enonce, int reponse, int limiteMin, int limiteMax):
-    d_enonce{std::move(enonce)},d_reponse{reponse}, d_limiteMinimum{limiteMin}, d_limiteMaximum{limiteMax}
+
+questionNumerique::questionNumerique(std::string enonce, int reponse, int limiteMin, int limiteMax)
+    : d_enonce{std::move(enonce)},
+      d_reponse{reponse},
+      d_limiteMinimum{limiteMin},
+      d_limiteMaximum{limiteMax}
 {
-    if (d_limiteMinimum > d_limiteMaximum)
-        throw std::invalid_argument("limiteMinimum > limiteMaximum");
-    if (d_reponse < d_limiteMinimum || d_reponse > d_limiteMaximum)
-        throw std::invalid_argument("Réponse hors limites");
+    validerLimites();
+    validerReponse();
 }
 
 std::string questionNumerique::enonce() const {
@@ -37,23 +38,22 @@ int questionNumerique::limiteMaximum() const {
 bool estEntier(const std::string &s) {
     if (s.empty())
         return false;
-    else {
-        size_t j = 0;
-        if (s[0]== '-')
-            j = 1;
-        for (size_t i = j; i < s.length(); ++i)
-            if (!isdigit(s[i]))
-                return false;
+
+    size_t debut = (s[0] == '-') ? 1 : 0;
+
+    for (size_t i = debut; i < s.length(); ++i) {
+        if (!isdigit(s[i]))
+            return false;
     }
-    return true;
+
+    return debut < s.length();
 }
 
 bool questionNumerique::reponseJuste(const std::string &reponse) const {
-
     if (!estEntier(reponse))
         return false;
-    int valeur = std::stoi(reponse); //la chaîne est un entier
-    return (valeur >= d_limiteMinimum) && (valeur <= d_limiteMaximum);
+    int valeur = std::stoi(reponse);
+    return valeur == d_reponse;
 }
 
 std::string questionNumerique::typeQuestion() const {
@@ -69,10 +69,29 @@ void questionNumerique::sauvegarder(std::ofstream& fichier) const {
 }
 
 std::unique_ptr<question> questionNumerique::chargerDepuisFichier(std::ifstream& fichier) const {
-    std::string enonce;
-    int reponse, limMin, limMax;
+    std::string enonce, reponseStr, limMinStr, limMaxStr;
     std::getline(fichier, enonce);
-    fichier >> reponse >> limMin >> limMax;
-    fichier.ignore();
+    std::getline(fichier, reponseStr);
+    std::getline(fichier, limMinStr);
+    std::getline(fichier, limMaxStr);
+    int reponse = std::stoi(reponseStr);
+    int limMin = std::stoi(limMinStr);
+    int limMax = std::stoi(limMaxStr);
     return std::unique_ptr<question>(new questionNumerique(enonce, reponse, limMin, limMax));
+}
+
+bool questionNumerique::estDansIntervalle(int valeur) const {
+    return (valeur >= d_limiteMinimum) && (valeur <= d_limiteMaximum);
+}
+
+void questionNumerique::validerLimites() const {
+    if (d_limiteMinimum > d_limiteMaximum) {
+        throw std::invalid_argument("limiteMinimum > limiteMaximum");
+    }
+}
+
+void questionNumerique::validerReponse() const {
+    if (!estDansIntervalle(d_reponse)) {
+        throw std::invalid_argument("Réponse hors limites");
+    }
 }

@@ -104,9 +104,11 @@ TEST_CASE("[gestionnaire] Charger un questionnaire avec une question numérique"
     REQUIRE(qCharge.recupererQuestion(0).enonce() == "Combien font 5+7 ?");
     REQUIRE(qCharge.recupererQuestion(0).reponse() == "12");
     REQUIRE(qCharge.recupererQuestion(0).typeQuestion() == "NUMERIQUE");
+
+    // Seule la réponse exacte (12) est acceptée
     REQUIRE(qCharge.recupererQuestion(0).reponseJuste("12"));
-    REQUIRE(qCharge.recupererQuestion(0).reponseJuste("15"));
-    REQUIRE_FALSE(qCharge.recupererQuestion(0).reponseJuste("25"));
+    REQUIRE_FALSE(qCharge.recupererQuestion(0).reponseJuste("15"));  // dans l'intervalle mais pas exacte
+    REQUIRE_FALSE(qCharge.recupererQuestion(0).reponseJuste("25"));  // hors intervalle
 
     std::remove(nomFichier.c_str());
 }
@@ -128,6 +130,7 @@ TEST_CASE("[gestionnaire] Charger un questionnaire avec un QCM") {
     REQUIRE(qCharge.recupererQuestion(0).typeQuestion() == "QCM");
     REQUIRE(qCharge.recupererQuestion(0).reponseJuste("0"));
     REQUIRE_FALSE(qCharge.recupererQuestion(0).reponseJuste("1"));
+    REQUIRE_FALSE(qCharge.recupererQuestion(0).reponseJuste("2"));
 
     std::remove(nomFichier.c_str());
 }
@@ -182,6 +185,50 @@ TEST_CASE("[gestionnaire] Sauvegarde et chargement préservent les données") {
         REQUIRE(qLoad.typeQuestion() == qOrig.typeQuestion());
         REQUIRE(qLoad.enonce() == qOrig.enonce());
         REQUIRE(qLoad.reponse() == qOrig.reponse());
+    }
+
+    std::remove(nomFichier.c_str());
+}
+
+TEST_CASE("[gestionnaire] La validation des réponses fonctionne après chargement") {
+    gestionnaire g;
+    questionnaire qOriginal{"Quiz de validation"};
+
+    // Question texte
+    qOriginal.ajouterQuestion(std::make_unique<questionTexte>("Capitale ?", "Paris"));
+
+    // Question numérique
+    qOriginal.ajouterQuestion(std::make_unique<questionNumerique>("2+2 ?", 4, 0, 10));
+
+    // Question QCM
+    std::vector<std::string> choix{"Rouge", "Vert", "Bleu"};
+    qOriginal.ajouterQuestion(std::make_unique<questionQCM>("Couleur du ciel ?", choix, 2));
+
+    std::string nomFichier = "test_validation.txt";
+    g.sauvegarder(qOriginal, nomFichier);
+
+    questionnaire qCharge = g.charger(nomFichier);
+
+    SUBCASE("Question texte : validation correcte") {
+        const question& q = qCharge.recupererQuestion(0);
+        REQUIRE(q.reponseJuste("Paris"));
+        REQUIRE_FALSE(q.reponseJuste("Londres"));
+    }
+
+    SUBCASE("Question numérique : seule la réponse exacte est acceptée") {
+        const question& q = qCharge.recupererQuestion(1);
+        REQUIRE(q.reponseJuste("4"));      // réponse exacte
+        REQUIRE_FALSE(q.reponseJuste("5")); // dans l'intervalle mais pas exacte
+        REQUIRE_FALSE(q.reponseJuste("0")); // limite min
+        REQUIRE_FALSE(q.reponseJuste("10")); // limite max
+        REQUIRE_FALSE(q.reponseJuste("11")); // hors intervalle
+    }
+
+    SUBCASE("Question QCM : validation correcte") {
+        const question& q = qCharge.recupererQuestion(2);
+        REQUIRE(q.reponseJuste("2"));
+        REQUIRE_FALSE(q.reponseJuste("0"));
+        REQUIRE_FALSE(q.reponseJuste("1"));
     }
 
     std::remove(nomFichier.c_str());
