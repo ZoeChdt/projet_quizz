@@ -13,7 +13,7 @@ session::session(const questionnaire &q) : d_questionnaire{q}, d_index{0}
 }
 
 bool session::estTerminee() const {
-    return d_index==d_questionnaire.nombreQuestions();
+    return d_index==d_indices.size();
 }
 
 const question &session::questionCourante() const {
