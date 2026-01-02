@@ -53,6 +53,8 @@ bool questionNumerique::reponseJuste(const std::string &reponse) const {
     if (!estEntier(reponse))
         return false;
     int valeur = std::stoi(reponse);
+    if (!estDansIntervalle(valeur)) 
+        return false;
     return valeur == d_reponse;
 }
 
