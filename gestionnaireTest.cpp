@@ -1,7 +1,6 @@
 //
 // Created by chzoe on 13/12/2025.
 //
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 #include "gestionnaire.h"
 #include "questionTexte.h"
