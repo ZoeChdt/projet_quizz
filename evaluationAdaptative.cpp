@@ -3,7 +3,7 @@
 //
 
 #include "evaluationAdaptative.h"
-
+#include <algorithm>
 #include <random>
 
 evaluationAdaptative::evaluationAdaptative(const questionnaire &q) : sessionEvaluation{q} {
