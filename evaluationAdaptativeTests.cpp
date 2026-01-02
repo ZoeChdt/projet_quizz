@@ -37,6 +37,7 @@ TEST_CASE("[evaluationAdaptative] La classe est correctement implémentéé") {
         REQUIRE_FALSE(e.estTerminee());
         e.questionSuivante();
         e.transmettreReponse(e.reponseCourante());
+        e.questionSuivante();
         REQUIRE(e.estTerminee());
     }
 
