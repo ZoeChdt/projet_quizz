@@ -1,7 +1,6 @@
 //
 // Created by chzoe on 18/11/2025.
 //
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 #include "questionNumerique.h"
 
@@ -16,11 +15,11 @@ void lesLimitesSont(const questionNumerique& q, int min, int max) {
     REQUIRE(q.limiteMaximum() == max);
 }
 
-void laReponseEstAcceptee(const question& q, const std::string& reponse) {
+void laReponseNumEstAcceptee(const question& q, const std::string& reponse) {
     REQUIRE(q.reponseJuste(reponse));
 }
 
-void laReponseEstRefusee(const question& q, const std::string& reponse) {
+void laReponseNumEstRefusee(const question& q, const std::string& reponse) {
     REQUIRE_FALSE(q.reponseJuste(reponse));
 }
 
@@ -73,14 +72,14 @@ TEST_CASE("[questionNumerique] Seule la réponse exacte est acceptée") {
     questionNumerique q{"Combien font 10+5 ?", 15, 10, 20};
 
     SUBCASE("La réponse exacte est acceptée") {
-        laReponseEstAcceptee(q, "15");
+        laReponseNumEstAcceptee(q, "15");
     }
 
     SUBCASE("Les autres valeurs dans l'intervalle sont refusées") {
-        laReponseEstRefusee(q, "10");  // limite min
-        laReponseEstRefusee(q, "20");  // limite max
-        laReponseEstRefusee(q, "12");  // valeur intermédiaire
-        laReponseEstRefusee(q, "18");  // valeur intermédiaire
+        laReponseNumEstRefusee(q, "10");  // limite min
+        laReponseNumEstRefusee(q, "20");  // limite max
+        laReponseNumEstRefusee(q, "12");  // valeur intermédiaire
+        laReponseNumEstRefusee(q, "18");  // valeur intermédiaire
     }
 }
 
@@ -88,13 +87,13 @@ TEST_CASE("[questionNumerique] Les valeurs hors intervalle sont refusées") {
     questionNumerique q{"Combien font 10+5 ?", 15, 10, 20};
 
     SUBCASE("Une valeur en dessous du minimum est refusée") {
-        laReponseEstRefusee(q, "9");
-        laReponseEstRefusee(q, "0");
+        laReponseNumEstRefusee(q, "9");
+        laReponseNumEstRefusee(q, "0");
     }
 
     SUBCASE("Une valeur au-dessus du maximum est refusée") {
-        laReponseEstRefusee(q, "21");
-        laReponseEstRefusee(q, "100");
+        laReponseNumEstRefusee(q, "21");
+        laReponseNumEstRefusee(q, "100");
     }
 }
 
@@ -102,15 +101,15 @@ TEST_CASE("[questionNumerique] Les entrées invalides sont refusées") {
     questionNumerique q{"Combien font 10+5 ?", 15, 10, 20};
 
     SUBCASE("Une chaîne non numérique est refusée") {
-        laReponseEstRefusee(q, "abc");
+        laReponseNumEstRefusee(q, "abc");
     }
 
     SUBCASE("Une chaîne vide est refusée") {
-        laReponseEstRefusee(q, "");
+        laReponseNumEstRefusee(q, "");
     }
 
     SUBCASE("Un nombre décimal est refusé") {
-        laReponseEstRefusee(q, "15.5");
+        laReponseNumEstRefusee(q, "15.5");
     }
 }
 
@@ -118,18 +117,18 @@ TEST_CASE("[questionNumerique] Les réponses négatives fonctionnent correctemen
     questionNumerique q{"Température", -5, -10, 0};
 
     SUBCASE("La réponse exacte négative est acceptée") {
-        laReponseEstAcceptee(q, "-5");
+        laReponseNumEstAcceptee(q, "-5");
     }
 
     SUBCASE("Les autres valeurs dans l'intervalle sont refusées") {
-        laReponseEstRefusee(q, "-10");  // limite min
-        laReponseEstRefusee(q, "0");    // limite max
-        laReponseEstRefusee(q, "-7");   // valeur intermédiaire
+        laReponseNumEstRefusee(q, "-10");  // limite min
+        laReponseNumEstRefusee(q, "0");    // limite max
+        laReponseNumEstRefusee(q, "-7");   // valeur intermédiaire
     }
 
     SUBCASE("Les valeurs hors de l'intervalle sont refusées") {
-        laReponseEstRefusee(q, "-11");
-        laReponseEstRefusee(q, "1");
+        laReponseNumEstRefusee(q, "-11");
+        laReponseNumEstRefusee(q, "1");
     }
 }
 
@@ -160,12 +159,12 @@ TEST_CASE("[questionNumerique] La sauvegarde et le chargement préservent les do
     }
 
     SUBCASE("Seule la réponse exacte est acceptée après chargement") {
-        laReponseEstAcceptee(*qCharge, "15");  // réponse exacte
-        laReponseEstRefusee(*qCharge, "0");    // limite min
-        laReponseEstRefusee(*qCharge, "30");   // limite max
-        laReponseEstRefusee(*qCharge, "20");   // dans l'intervalle
-        laReponseEstRefusee(*qCharge, "31");   // hors intervalle
-        laReponseEstRefusee(*qCharge, "-1");   // hors intervalle
+        laReponseNumEstAcceptee(*qCharge, "15");  // réponse exacte
+        laReponseNumEstRefusee(*qCharge, "0");    // limite min
+        laReponseNumEstRefusee(*qCharge, "30");   // limite max
+        laReponseNumEstRefusee(*qCharge, "20");   // dans l'intervalle
+        laReponseNumEstRefusee(*qCharge, "31");   // hors intervalle
+        laReponseNumEstRefusee(*qCharge, "-1");   // hors intervalle
     }
     std::remove(nomFichier.c_str());
 }
