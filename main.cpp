@@ -52,9 +52,9 @@ void afficheMenu()
     cout << "Choix : ";
 }
 
-void afficheChoixSiQCM(const question& q) {
-    if (q.typeQuestion() == "QCM") {
-        const questionQCM& qcm = static_cast<const questionQCM&>(q);
+void afficheChoixSiQCM(const question& questionC) {
+    if (questionC.typeQuestion() == "QCM") {
+        const questionQCM& qcm = static_cast<const questionQCM&>(questionC);
         for (int i = 0; i < qcm.nombreChoix(); i++) {
             std::cout<<i<<". "<<qcm.choix(i)<< std::endl;
         }
@@ -131,8 +131,8 @@ void choixMenu()
                 sessionApprentissage sessionApp{q};
 
                 while (!sessionApp.estTerminee()) {
-                    const question &quest = sessionApp.questionCourante();
-                    cout << quest.enonce() <<"\n";
+                    const question &questionC = sessionApp.questionCourante();
+                    cout << questionC.enonce() <<"\n";
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
                     cout <<"Réponse : "<<sessionApp.reponseCourante() <<endl;
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
