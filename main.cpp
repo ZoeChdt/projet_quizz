@@ -7,13 +7,14 @@
 #include "evaluationTest.h"
 #include "evaluationSecondeChance.h"
 #include "evaluationAdaptative.h"
+#include "questionChoixMultiples.h"
+#include <thread>
+#include <chrono>
+
 using std::cout;
 using std::cin;
 using std::string;
 using std::endl;
-
-
-
 
 void chargerFichier(questionnaire &q)
 {
@@ -28,7 +29,7 @@ void chargerFichier(questionnaire &q)
 
         try {
             q = g.charger(nom_fichier);
-            cout << "Questionnaire charge."<<endl;
+            cout << "Questionnaire charge"<<endl;
             charge = true;
         }
         catch (const std::exception& erreur) {
@@ -44,11 +45,20 @@ void afficheMenu()
     cout<<"Menu"<<endl;
     cout << "A. Charger un autre questionnaire"<<endl;
     cout << "B. Apprentissage"<<endl;
-    cout << "C. Evaluation test"<<endl;
+    cout << "C. Evaluation"<<endl;
     cout << "D. Evaluation seconde chance"<<endl;
     cout << "E. Evaluation adaptative"<<endl;
     cout << "F. Quitter"<<endl;
     cout << "Choix : ";
+}
+
+void afficheChoixSiQCM(const question& q) {
+    if (q.typeQuestion() == "QCM") {
+        const questionQCM& qcm = static_cast<const questionQCM&>(q);
+        for (int i = 0; i < qcm.nombreChoix(); i++) {
+            std::cout<<i<<". "<<qcm.choix(i)<< std::endl;
+        }
+    }
 }
 
 
@@ -57,6 +67,7 @@ void executerSession(sessionEvaluation& eval, const questionnaire& q, const stri
     while (!eval.estTerminee()) {
 
         cout << eval.questionCourante().enonce() << endl;
+        afficheChoixSiQCM(eval.questionCourante());
 
         string rep;
         cin >> rep;
@@ -65,15 +76,15 @@ void executerSession(sessionEvaluation& eval, const questionnaire& q, const stri
         cout << endl;
         if (!juste)
         {
-            if (typeEval == "Test simple") {
+            if (typeEval == "Evaluation simple") {
                 cout << eval.reponseCourante() << endl;
             }
-            else if (typeEval == "Seconde chance") {
+            else if (typeEval == "Evaluation seconde chance") {
 
                 if (eval.afficherBonneReponse())
-                    cout << "Reponse : " << eval.reponseCourante() << endl;
+                    cout << "Reponse : " << eval.reponseCourante() <<"\n";
             }
-            else if (typeEval == "Adaptatif") {
+            else if (typeEval == "Evaluation adaptative") {
 
                 if (!eval.afficherBonneReponse())
                     cout << "Mauvaise reponse" << endl;
@@ -84,12 +95,11 @@ void executerSession(sessionEvaluation& eval, const questionnaire& q, const stri
             eval.questionSuivante();
     }
 
-    cout << endl<<"Résultats :" << endl;
+    cout << endl<<"Resultats :" << endl;
     cout << "Questions : " << q.nombreQuestions() << endl;
     cout << "Essais : " << eval.nombreEssais() << endl;
-    cout << "Bonnes réponses : " << eval.nombreQuestionsJustes() << endl;
+    cout << "Bonnes reponses : " << eval.nombreQuestionsJustes() << endl;
 }
-
 
 
 void choixMenu()
@@ -121,10 +131,14 @@ void choixMenu()
                 sessionApprentissage sessionApp{q};
 
                 while (!sessionApp.estTerminee()) {
-                    cout << sessionApp.questionCourante().enonce() <<endl;
+                    const question &quest = sessionApp.questionCourante();
+                    cout << quest.enonce() <<"\n";
+                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
                     cout <<"Réponse : "<<sessionApp.reponseCourante() <<endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
                     sessionApp.questionSuivante();
                 }
+                cout<<endl;
 
                 break;
                 }
@@ -132,7 +146,7 @@ void choixMenu()
             case 'C':
                 {
                 evaluationTest eval{q};
-                typeEval = "Test simple";
+                typeEval = "Evaluation simple";
                 executerSession(eval, q, typeEval);
                 break;
                 }
@@ -140,7 +154,7 @@ void choixMenu()
             case 'D':
                 {
                 evaluationSecondeChance evalSeconde{q};
-                typeEval = "Seconde chance";
+                typeEval = "Evaluation seconde chance";
                 executerSession(evalSeconde, q, typeEval);
                 break;
                 }
@@ -148,7 +162,7 @@ void choixMenu()
             case 'E':
                 {
                     evaluationAdaptative evalAdapt(q);
-                    typeEval = "Adaptatif";
+                    typeEval = "Evaluation adaptative";
                     executerSession(evalAdapt, q, typeEval);
                      break;
                 }
