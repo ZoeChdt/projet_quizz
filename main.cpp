@@ -203,7 +203,6 @@ void creerQuestionnaire() {
     }
 }
 
-
 void afficheMenu()
 {
     cout<<"Menu"<<endl;
@@ -227,22 +226,22 @@ void afficheChoixSiQCM(const question& questionC) {
 }
 
 
-void executerSession(sessionEvaluation& eval, const questionnaire& q, const string &typeEval)
+void executerSession(sessionEvaluation& eval,
+                     const questionnaire& questionnaireCourant, const string &typeEval)
 {
     while (!eval.estTerminee()) {
 
         cout << eval.questionCourante().enonce() << endl;
         afficheChoixSiQCM(eval.questionCourante());
 
-        string rep;
-        cin >> rep;
+        string repUser;
+        cin >> repUser;
 
-        bool juste = eval.transmettreReponse(rep);
-        cout << endl;
+        bool juste = eval.transmettreReponse(repUser);
         if (!juste)
         {
             if (typeEval == "Evaluation simple") {
-                cout << eval.reponseCourante() << endl;
+                cout <<"Reponse : "<< eval.reponseCourante() << endl;
             }
             else if (typeEval == "Evaluation seconde chance") {
 
@@ -250,26 +249,38 @@ void executerSession(sessionEvaluation& eval, const questionnaire& q, const stri
                     cout << "Reponse : " << eval.reponseCourante() <<"\n";
             }
             else if (typeEval == "Evaluation adaptative") {
-
                 if (!eval.afficherBonneReponse())
-                    cout << "Mauvaise reponse" << endl;
+                    cout<< "Mauvaise reponse" << endl;
             }
         }
-
-        if (!eval.estTerminee())
-            eval.questionSuivante();
+        eval.questionSuivante();
+        cout<<endl;
     }
 
     cout << endl<<"Resultats :" << endl;
-    cout << "Questions : " << q.nombreQuestions() << endl;
+    cout << "Questions : " << questionnaireCourant.nombreQuestions() << endl;
     cout << "Essais : " << eval.nombreEssais() << endl;
     cout << "Bonnes reponses : " << eval.nombreQuestionsJustes() << endl;
+}
+
+void genereQuestionnaireParDefaut(questionnaire& questionnaireCourant)
+{
+    questionnaireCourant.ajouterQuestion(std::make_unique<questionTexte> ("Quelle est la capitale de la France ?","Paris"));
+    questionnaireCourant.ajouterQuestion(std::make_unique<questionTexte> ("Quelle est la capitale de l'Allemagne ?","Berlin"));
+    questionnaireCourant.ajouterQuestion(std::make_unique<questionNumerique>("2+2 ?", 4, 0, 10));
+    std::vector<std::string> choix{"Rouge", "Vert", "Bleu", "Noir"};
+    questionnaireCourant.ajouterQuestion(std::make_unique<questionQCM>("Couleur du ciel ?", choix, 2));
+    std::string nomFichier = "test_validation.txt";
+    gestionnaire g;
+    g.sauvegarder(questionnaireCourant, nomFichier);
 }
 
 
 void choixMenu()
 {
-    questionnaire q{"Questionnaire vide"};
+    questionnaire questionnaireCourant{"Questionnaire par défaut"};
+    genereQuestionnaireParDefaut(questionnaireCourant);
+
 
     bool quitter = false;
     string typeEval;
@@ -285,19 +296,19 @@ void choixMenu()
         {
             case 'A':
                 {
-                    chargerFichier(q);
+                    chargerFichier(questionnaireCourant);
                     break;
                 }
 
             case 'B':
                 {
-                sessionApprentissage sessionApp{q};
+                sessionApprentissage sessionApp{questionnaireCourant};
 
                 while (!sessionApp.estTerminee()) {
                     const question &questionC = sessionApp.questionCourante();
                     cout << questionC.enonce() <<"\n";
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                    cout <<"R?ponse : "<<sessionApp.reponseCourante() <<endl;
+                    cout <<"Réponse : "<<sessionApp.reponseCourante() <<endl;
                     std::this_thread::sleep_for(std::chrono::milliseconds(500));
                     sessionApp.questionSuivante();
                 }
@@ -308,27 +319,28 @@ void choixMenu()
 
             case 'C':
                 {
-                evaluationTest eval{q};
+                evaluationTest eval{questionnaireCourant};
                 typeEval = "Evaluation simple";
-                executerSession(eval, q, typeEval);
+                executerSession(eval, questionnaireCourant, typeEval);
                 break;
                 }
 
             case 'D':
                 {
-                evaluationSecondeChance evalSeconde{q};
+                evaluationSecondeChance evalSeconde{questionnaireCourant};
                 typeEval = "Evaluation seconde chance";
-                executerSession(evalSeconde, q, typeEval);
+                executerSession(evalSeconde, questionnaireCourant, typeEval);
                 break;
                 }
 
             case 'E':
                 {
-                    evaluationAdaptative evalAdapt(q);
+                    evaluationAdaptative evalAdapt{questionnaireCourant};
                     typeEval = "Evaluation adaptative";
-                    executerSession(evalAdapt, q, typeEval);
+                    executerSession(evalAdapt, questionnaireCourant, typeEval);
                      break;
                 }
+
             case 'F':
                 creerQuestionnaire();
                 break;
@@ -350,3 +362,4 @@ int main()
     choixMenu();
     return 0;
 }
+
